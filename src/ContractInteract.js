@@ -12,6 +12,7 @@ const ContractInteract = (props) => {
   //State variables
   const [walletAddress, setWallet] = useState('');
   const [status, setStatus] = useState('');
+  const [description, setDescription] = useState('');
 
 
   function addWalletListener() {
@@ -54,9 +55,14 @@ const ContractInteract = (props) => {
     setWallet(walletResponse.address);
   };
 
+  const onMintPressed = async () => {
+    const { status } = await mintNFT(description);
+    setStatus(status);
+  };
+
 
   return (
-    <div className="Minter">
+    <div className="ContractInteract">
       <button id="walletButton" onClick={connectWalletPressed}>
         {walletAddress.length > 0 ? (
           'Connected: ' +
@@ -67,6 +73,20 @@ const ContractInteract = (props) => {
           <span>Connect Wallet</span>
         )}
       </button>
+
+      <form>
+
+        <h2>✍️ Message: </h2>
+        <input
+          type="text"
+          placeholder="e.g. Even cooler than cryptokitties ;)"
+          onChange={(event) => setDescription(event.target.value)}
+        />
+      </form>
+      <button id="mintButton" onClick={onMintPressed}>
+        Mint NFT
+      </button>
+      <p id="status">{status}</p>
 
       <p id="status">{status}</p>
     </div>

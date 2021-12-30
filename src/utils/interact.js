@@ -5,8 +5,8 @@ const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
 
 const web3 = createAlchemyWeb3(alchemyKey);
 
-//const contractABI = require('../contract-abi.json');
-//const contractAddress = '0x4C4a07F737Bf57F6632B6CAB089B78f62385aCaE';
+const contractABI = require('../write_stone_abi.json');
+const contractAddress = '0x41c0aCA5f76C0D028199c5068aD002E90af9e4f9';
 export const connectWallet = async () => {
   // Function to connect wallet to dApp
   if (window.ethereum) {
@@ -85,3 +85,47 @@ export const getCurrentWalletConnected = async () => {
     };
   }
 };
+
+
+export const mintNFT = async(description) => {
+
+  //error handling
+  if (description.trim() == "") { 
+      return {
+          success: false,
+          status: "❗Please make sure all fields are completed before minting.",
+      }
+  }
+
+  //make metadata
+
+
+
+  //load smart contract
+  window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
+
+  //set up your Ethereum transaction
+  const transactionParameters = {
+      to: contractAddress, // Required except during contract publications.
+      from: window.ethereum.selectedAddress, // must match user's active address.
+      'data': window.contract.methods.write(description).encodeABI() //make call to NFT smart contract 
+  };
+
+  //sign transaction via Metamask
+  try {
+      const txHash = await window.ethereum
+          .request({
+              method: 'eth_sendTransaction',
+              params: [transactionParameters],
+          });
+      return {
+          success: true,
+          status: "✅ Check out your transaction on Etherscan: https://mumbai.polygonscan.com/tx/" + txHash
+      }
+  } catch (error) {
+      return {
+          success: false,
+          status: "😥 Something went wrong: " + error.message
+      }
+  }
+}
